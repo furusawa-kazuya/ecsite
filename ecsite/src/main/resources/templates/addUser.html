@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link href="/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+<script src="http://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+$(() => {
+	$('.addUserBtn').on('click', (event) => {
+		$.ajax({
+			type: 'POST',
+			url: '/ecsite/admin/checkUserName',
+			data: JSON.stringify({'userName': $('input[name=userName]').val()}),
+			datatype: 'json',
+			contentType: 'application/json',
+		})
+		.then((result) => {
+			if (result) {
+				alert('既にユーザー名が存在するため使用できません。');
+			} else {
+				let jsonString = {
+						'userName': $('input[name=userName]').val(),
+						'password': $('input[name=password]').val(),
+						'fullName': $('input[name=fullName]').val()
+				};
+				$.ajax({
+					type: 'POST',
+					url: '/ecsite/admin/addUser',
+					data: JSON.stringify(jsonString),
+					contentType: 'application/json',
+					datatype: 'json',
+					scriptcharset: 'utf-8'
+				})
+				.then((result) => {
+					alert('新規ユーザーの登録が完了しました。');
+					location.replace('/ecsite/admin/');
+				}, () => {
+					console.error('Error: ajax connection failed.');
+				});
+			}
+		}, () => {
+			alert('Error: ajax connection failed.');
+		});
+	});
+});
+</script>
+<title>ユーザー登録</title>
+</head>
+<body>
+
+	<header>
+		<h1>My EC Site</h1>
+	</header>
+	
+	<div id="adminPage">
+		<h2>ユーザー登録</h2>
+			<p>ユーザー名：<input type="text" name="userName" required /></p>
+			<p>パスワード ：<input type="password" name="password" required /></p>
+			<p>フルネーム ：<input type="text" name="fullName" required /></p>
+			<button class="addUserBtn">登録</button>
+	</div>
+</body>
+</html>
